@@ -1,0 +1,24 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: continuum-control
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/continuum_control}
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD:dev}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
