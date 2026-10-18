@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,14 +17,16 @@ import java.util.List;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    public record ErrorField(String field, String message) {}
+    public record ErrorField(String field, String message) {
+    }
 
     public record ErrorResponse(
             Instant timestamp,
             int status,
             String error,
             List<ErrorField> fieldErrors
-    ) {}
+    ) {
+    }
 
     @ExceptionHandler(EntidadeNaoLocalizadaException.class)
     public ResponseEntity<ErrorResponse> handleEntidadeNaoLocalizada(EntidadeNaoLocalizadaException ex) {
@@ -118,5 +121,17 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleRotaNaoEncontrada() {
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Rota não encontrado",
+                List.of()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }

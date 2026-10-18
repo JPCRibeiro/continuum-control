@@ -4,11 +4,11 @@ import br.edu.infnet.continuum_control.agente.domain.Agente;
 import br.edu.infnet.continuum_control.agente.domain.Situacao;
 
 public record AgenteResponse(
-    Long id,
-    String codigo,
-    String codinome,
-    String especialidade,
-    Situacao situacao
+        Long id,
+        String codigo,
+        String codinome,
+        String especialidade,
+        Situacao situacao
 ) {
     public static AgenteResponse from(Agente agente) {
         return new AgenteResponse(
