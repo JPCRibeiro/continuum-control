@@ -1,7 +1,7 @@
 package br.edu.infnet.continuum_control.agente.service;
 
 import br.edu.infnet.continuum_control.agente.domain.Agente;
-import br.edu.infnet.continuum_control.agente.domain.Situacao;
+import br.edu.infnet.continuum_control.agente.domain.SituacaoAgente;
 import br.edu.infnet.continuum_control.agente.repository.AgenteRepository;
 import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
 import br.edu.infnet.continuum_control.shared.GeradorCodigo;
@@ -29,14 +29,14 @@ public class AgenteService {
 
     public Agente buscarPorId(Long id) {
         return agenteRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNaoLocalizadaException("Agente não encontrado"));
+                .orElseThrow(() -> new EntidadeNaoLocalizadaException("Agente não localizado"));
     }
 
     public List<Agente> listarDisponiveis() {
-        return listarPorSituacao(Situacao.DISPONIVEL);
+        return listarPorSituacao(SituacaoAgente.DISPONIVEL);
     }
 
-    public List<Agente> listarPorSituacao(Situacao situacao) {
+    public List<Agente> listarPorSituacao(SituacaoAgente situacao) {
         return agenteRepository.findBySituacao(situacao);
     }
 

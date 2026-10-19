@@ -1,0 +1,77 @@
+package br.edu.infnet.continuum_control.anomalia.service;
+
+import br.edu.infnet.continuum_control.anomalia.domain.Anomalia;
+import br.edu.infnet.continuum_control.anomalia.domain.Risco;
+import br.edu.infnet.continuum_control.anomalia.domain.SituacaoAnomalia;
+import br.edu.infnet.continuum_control.anomalia.repository.AnomaliaRepository;
+import br.edu.infnet.continuum_control.evento.domain.Evento;
+import br.edu.infnet.continuum_control.evento.service.EventoService;
+import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class AnomaliaService {
+    private final AnomaliaRepository anomaliaRepository;
+    private final EventoService eventoService;
+
+    public Anomalia registrar(Long eventoId, String divergencia, Risco risco, String origem, String observacao) {
+        Evento evento = eventoService.buscarPorId(eventoId);
+        Anomalia anomalia = new Anomalia(evento, divergencia, risco, origem, observacao);
+
+        return anomaliaRepository.save(anomalia);
+    }
+
+    public List<Anomalia> listar() {
+        return anomaliaRepository.findAll();
+    }
+
+    public Anomalia buscarPorId(Long id) {
+        return anomaliaRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoLocalizadaException("Anomalia não localizada"));
+    }
+
+    public List<Anomalia> listarAtivas() {
+        return anomaliaRepository.findBySituacaoIn(
+                List.of(
+                        SituacaoAnomalia.DETECTADA,
+                        SituacaoAnomalia.EM_ANALISE,
+                        SituacaoAnomalia.CONFIRMADA,
+                        SituacaoAnomalia.EM_CORRECAO
+        ));
+    }
+
+    public List<Anomalia> listarCriticas() {
+        return listarPorRisco(Risco.CRITICO);
+    }
+
+    public List<Anomalia> listarPorSituacao(SituacaoAnomalia situacao) {
+        return anomaliaRepository.findBySituacao(situacao);
+    }
+
+    public List<Anomalia> listarPorRisco(Risco risco) {
+        return anomaliaRepository.findByRisco(risco);
+    }
+
+    @Transactional
+    public Anomalia atualizar(Long id, String divergencia, String origem, String observacao) {
+        Anomalia anomalia = buscarPorId(id);
+        anomalia.setDivergencia(divergencia);
+        anomalia.setOrigem(origem);
+        anomalia.setObservacao(observacao);
+
+        return anomalia;
+    }
+
+    @Transactional
+    public Anomalia classificarRisco(Long id, Risco risco) {
+        Anomalia anomalia = buscarPorId(id);
+        anomalia.classificarRisco(risco);
+
+        return anomalia;
+    }
+}

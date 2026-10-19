@@ -1,7 +1,7 @@
 package br.edu.infnet.continuum_control.agente;
 
 import br.edu.infnet.continuum_control.agente.domain.Agente;
-import br.edu.infnet.continuum_control.agente.domain.Situacao;
+import br.edu.infnet.continuum_control.agente.domain.SituacaoAgente;
 import br.edu.infnet.continuum_control.agente.repository.AgenteRepository;
 import br.edu.infnet.continuum_control.agente.service.AgenteService;
 import br.edu.infnet.continuum_control.shared.GeradorCodigo;
@@ -39,7 +39,7 @@ public class AgenteServiceTest {
         assertEquals("ns02m9qm", agente.getCodigo());
         assertEquals("James Bond", agente.getCodinome());
         assertEquals("Espionagem", agente.getEspecialidade());
-        assertEquals(Situacao.DISPONIVEL, agente.getSituacao());
+        assertEquals(SituacaoAgente.DISPONIVEL, agente.getSituacao());
     }
 
     @Test
@@ -57,6 +57,6 @@ public class AgenteServiceTest {
 
         agenteService.inativar(1L);
 
-        assertEquals(Situacao.INATIVO, agente.getSituacao());
+        assertEquals(SituacaoAgente.INATIVO, agente.getSituacao());
     }
 }

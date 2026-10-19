@@ -29,7 +29,7 @@ public class EventoService {
 
     public Evento buscarPorId(Long id) {
         return eventoRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNaoLocalizadaException("Evento não encontrado"));
+                .orElseThrow(() -> new EntidadeNaoLocalizadaException("Evento não localizado"));
     }
 
     public List<Evento> listarPorImportancia(Importancia importancia) {

@@ -3,7 +3,7 @@ package br.edu.infnet.continuum_control.agente.api.controller;
 import br.edu.infnet.continuum_control.agente.api.dto.AgenteResponse;
 import br.edu.infnet.continuum_control.agente.api.dto.RegistrarAgenteRequest;
 import br.edu.infnet.continuum_control.agente.domain.Agente;
-import br.edu.infnet.continuum_control.agente.domain.Situacao;
+import br.edu.infnet.continuum_control.agente.domain.SituacaoAgente;
 import br.edu.infnet.continuum_control.agente.service.AgenteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,16 +38,16 @@ public class AgenteController {
     }
 
     @GetMapping
-    public List<AgenteResponse> listar(@RequestParam(required = false) Situacao situacao,
+    public List<AgenteResponse> listar(@RequestParam(required = false) SituacaoAgente situacao,
                                        @RequestParam(required = false) String especialidade) {
         List<Agente> agentes;
 
         if (situacao != null) {
-            agentes =  agenteService.listarPorSituacao(situacao);
-        } else if  (especialidade != null) {
-            agentes =  agenteService.listarPorEspecialidade(especialidade);
+            agentes = agenteService.listarPorSituacao(situacao);
+        } else if (especialidade != null) {
+            agentes = agenteService.listarPorEspecialidade(especialidade);
         } else {
-            agentes =  agenteService.listar();
+            agentes = agenteService.listar();
         }
 
         return agentes

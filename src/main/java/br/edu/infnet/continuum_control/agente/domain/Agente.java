@@ -6,11 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="agentes")
+@Table(name = "agentes")
 @Getter
 public class Agente {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true, length = 8)
@@ -26,7 +26,7 @@ public class Agente {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Situacao situacao;
+    private SituacaoAgente situacao;
 
     protected Agente() {}
 
@@ -34,14 +34,14 @@ public class Agente {
         this.codigo = codigo;
         this.codinome = codinome;
         this.especialidade = especialidade;
-        this.situacao = Situacao.DISPONIVEL;
+        this.situacao = SituacaoAgente.DISPONIVEL;
     }
 
     public void inativar() {
-        if (situacao == Situacao.EM_MISSAO) {
+        if (situacao == SituacaoAgente.EM_MISSAO) {
             throw new OperacaoInvalidaException("Agente em missao não pode ser inativado");
         }
 
-        this.situacao = Situacao.INATIVO;
+        this.situacao = SituacaoAgente.INATIVO;
     }
 }

@@ -1,6 +1,6 @@
 package br.edu.infnet.continuum_control.agente.domain;
 
-public enum Situacao {
+public enum SituacaoAgente {
     DISPONIVEL,
     EM_MISSAO,
     SUSPENSO,

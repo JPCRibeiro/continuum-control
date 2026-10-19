@@ -1,14 +1,14 @@
 package br.edu.infnet.continuum_control.agente.api.dto;
 
 import br.edu.infnet.continuum_control.agente.domain.Agente;
-import br.edu.infnet.continuum_control.agente.domain.Situacao;
+import br.edu.infnet.continuum_control.agente.domain.SituacaoAgente;
 
 public record AgenteResponse(
         Long id,
         String codigo,
         String codinome,
         String especialidade,
-        Situacao situacao
+        SituacaoAgente situacao
 ) {
     public static AgenteResponse from(Agente agente) {
         return new AgenteResponse(
