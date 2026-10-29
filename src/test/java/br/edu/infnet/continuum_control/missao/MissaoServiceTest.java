@@ -9,7 +9,7 @@ import br.edu.infnet.continuum_control.anomalia.domain.SituacaoAnomalia;
 import br.edu.infnet.continuum_control.anomalia.service.AnomaliaService;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
-import br.edu.infnet.continuum_control.missao.domain.Impacto;
+import br.edu.infnet.continuum_control.shared.Impacto;
 import br.edu.infnet.continuum_control.missao.domain.Missao;
 import br.edu.infnet.continuum_control.missao.domain.Prioridade;
 import br.edu.infnet.continuum_control.missao.domain.SituacaoMissao;

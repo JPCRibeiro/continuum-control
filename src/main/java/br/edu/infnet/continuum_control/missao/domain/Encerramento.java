@@ -1,6 +1,7 @@
 package br.edu.infnet.continuum_control.missao.domain;
 
 import br.edu.infnet.continuum_control.anomalia.domain.SituacaoAnomalia;
+import br.edu.infnet.continuum_control.shared.Impacto;
 import jakarta.persistence.*;
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package br.edu.infnet.continuum_control.missao.api.dto;
 
-import br.edu.infnet.continuum_control.missao.domain.Impacto;
+import br.edu.infnet.continuum_control.shared.Impacto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

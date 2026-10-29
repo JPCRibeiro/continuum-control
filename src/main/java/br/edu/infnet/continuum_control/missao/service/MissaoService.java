@@ -10,6 +10,7 @@ import br.edu.infnet.continuum_control.missao.repository.AutorizacaoRepository;
 import br.edu.infnet.continuum_control.missao.repository.EncerramentoRepository;
 import br.edu.infnet.continuum_control.missao.repository.MissaoRepository;
 import br.edu.infnet.continuum_control.shared.GeradorCodigo;
+import br.edu.infnet.continuum_control.shared.Impacto;
 import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

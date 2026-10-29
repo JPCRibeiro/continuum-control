@@ -1,6 +1,6 @@
-package br.edu.infnet.continuum_control.missao.repository;
+package br.edu.infnet.continuum_control.intervencao.repository;
 
-import br.edu.infnet.continuum_control.missao.domain.Intervencao;
+import br.edu.infnet.continuum_control.intervencao.domain.Intervencao;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

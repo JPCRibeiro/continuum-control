@@ -1,11 +1,12 @@
-package br.edu.infnet.continuum_control.missao.service;
+package br.edu.infnet.continuum_control.intervencao.service;
 
 import br.edu.infnet.continuum_control.agente.domain.Agente;
 import br.edu.infnet.continuum_control.agente.service.AgenteService;
-import br.edu.infnet.continuum_control.missao.domain.Impacto;
-import br.edu.infnet.continuum_control.missao.domain.Intervencao;
+import br.edu.infnet.continuum_control.missao.service.MissaoService;
+import br.edu.infnet.continuum_control.shared.Impacto;
+import br.edu.infnet.continuum_control.intervencao.domain.Intervencao;
 import br.edu.infnet.continuum_control.missao.domain.Missao;
-import br.edu.infnet.continuum_control.missao.repository.IntervencaoRepository;
+import br.edu.infnet.continuum_control.intervencao.repository.IntervencaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,6 +1,8 @@
-package br.edu.infnet.continuum_control.missao.domain;
+package br.edu.infnet.continuum_control.intervencao.domain;
 
 import br.edu.infnet.continuum_control.agente.domain.Agente;
+import br.edu.infnet.continuum_control.shared.Impacto;
+import br.edu.infnet.continuum_control.missao.domain.Missao;
 import jakarta.persistence.*;
 import lombok.Getter;
 

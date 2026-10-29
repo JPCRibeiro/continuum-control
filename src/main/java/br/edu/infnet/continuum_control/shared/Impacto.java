@@ -1,4 +1,4 @@
-package br.edu.infnet.continuum_control.missao.domain;
+package br.edu.infnet.continuum_control.shared;
 
 public enum Impacto {
     MINIMO,

@@ -1,4 +1,4 @@
-package br.edu.infnet.continuum_control.missao;
+package br.edu.infnet.continuum_control.intervencao;
 
 import br.edu.infnet.continuum_control.agente.domain.Agente;
 import br.edu.infnet.continuum_control.agente.service.AgenteService;
@@ -6,10 +6,12 @@ import br.edu.infnet.continuum_control.anomalia.domain.Anomalia;
 import br.edu.infnet.continuum_control.anomalia.domain.Risco;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
+import br.edu.infnet.continuum_control.intervencao.domain.Intervencao;
 import br.edu.infnet.continuum_control.missao.domain.*;
-import br.edu.infnet.continuum_control.missao.repository.IntervencaoRepository;
-import br.edu.infnet.continuum_control.missao.service.IntervencaoService;
+import br.edu.infnet.continuum_control.intervencao.repository.IntervencaoRepository;
+import br.edu.infnet.continuum_control.intervencao.service.IntervencaoService;
 import br.edu.infnet.continuum_control.missao.service.MissaoService;
+import br.edu.infnet.continuum_control.shared.Impacto;
 import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

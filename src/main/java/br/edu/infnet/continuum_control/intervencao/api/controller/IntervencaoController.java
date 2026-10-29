@@ -1,8 +1,8 @@
-package br.edu.infnet.continuum_control.missao.api.controller;
+package br.edu.infnet.continuum_control.intervencao.api.controller;
 
-import br.edu.infnet.continuum_control.missao.api.dto.IntervencaoResponse;
-import br.edu.infnet.continuum_control.missao.api.dto.RegistrarIntervencaoRequest;
-import br.edu.infnet.continuum_control.missao.service.IntervencaoService;
+import br.edu.infnet.continuum_control.intervencao.api.dto.IntervencaoResponse;
+import br.edu.infnet.continuum_control.intervencao.api.dto.RegistrarIntervencaoRequest;
+import br.edu.infnet.continuum_control.intervencao.service.IntervencaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
