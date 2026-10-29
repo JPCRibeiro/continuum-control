@@ -1,6 +1,7 @@
 package br.edu.infnet.continuum_control.shared.api;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -128,10 +129,23 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
-                "Rota não encontrado",
+                "Rota não encontrada",
                 List.of()
         );
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleIntegridade(DataIntegrityViolationException ex) {
+        log.warn("Violação de integridade", ex);
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Violação de integridade de dados",
+                List.of()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 }

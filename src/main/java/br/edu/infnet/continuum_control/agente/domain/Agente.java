@@ -44,4 +44,24 @@ public class Agente {
 
         this.situacao = SituacaoAgente.INATIVO;
     }
+
+    public void validarDisponibilidade() {
+        if (situacao != SituacaoAgente.DISPONIVEL) {
+            throw new OperacaoInvalidaException("Agente não está disponível: " + situacao);
+        }
+    }
+
+    public void entrarMissao() {
+        validarDisponibilidade();
+
+        this.situacao = SituacaoAgente.EM_MISSAO;
+    }
+
+    public void liberar() {
+        if (situacao != SituacaoAgente.EM_MISSAO) {
+            throw new OperacaoInvalidaException("Agente não está em missão para ser liberado");
+        }
+
+        this.situacao = SituacaoAgente.DISPONIVEL;
+    }
 }

@@ -74,4 +74,20 @@ public class AnomaliaService {
 
         return anomalia;
     }
+
+    @Transactional
+    public Anomalia analisar(Long id) {
+        Anomalia anomalia = buscarPorId(id);
+        anomalia.analisar();
+
+        return anomalia;
+    }
+
+    @Transactional
+    public Anomalia tornarIrreversivel(Long id) {
+        Anomalia anomalia = buscarPorId(id);
+        anomalia.tornarIrreversivel();
+
+        return anomalia;
+    }
 }

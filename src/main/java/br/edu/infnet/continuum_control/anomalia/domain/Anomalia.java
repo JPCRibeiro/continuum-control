@@ -1,6 +1,7 @@
 package br.edu.infnet.continuum_control.anomalia.domain;
 
 import br.edu.infnet.continuum_control.evento.domain.Evento;
+import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,5 +55,42 @@ public class Anomalia {
 
     public void classificarRisco(Risco novoRisco) {
         this.risco = novoRisco;
+    }
+
+    public void validarAceitaNovaMissao() {
+        if (situacao == SituacaoAnomalia.IRREVERSIVEL) {
+            throw new OperacaoInvalidaException("Anomalia irreversível não recebe missões");
+        }
+    }
+
+    public void analisar() {
+        exigirNaoIrreversivel();
+        this.situacao = SituacaoAnomalia.EM_ANALISE;
+    }
+
+    public void iniciarCorrecao() {
+        exigirNaoIrreversivel();
+        this.situacao = SituacaoAnomalia.EM_CORRECAO;
+    }
+
+    public void confirmar() {
+        exigirNaoIrreversivel();
+        situacao = SituacaoAnomalia.CONFIRMADA;
+    }
+
+    public void estabilizar() {
+        exigirNaoIrreversivel();
+        situacao = SituacaoAnomalia.ESTABILIZADA;
+    }
+
+    public void tornarIrreversivel() {
+        exigirNaoIrreversivel();
+        situacao = SituacaoAnomalia.IRREVERSIVEL;
+    }
+
+    private void exigirNaoIrreversivel() {
+        if (situacao == SituacaoAnomalia.IRREVERSIVEL) {
+            throw new OperacaoInvalidaException("Anomalia irreversível não muda de situação");
+        }
     }
 }

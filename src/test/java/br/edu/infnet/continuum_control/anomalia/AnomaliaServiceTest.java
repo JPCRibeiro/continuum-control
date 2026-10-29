@@ -9,6 +9,7 @@ import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
 import br.edu.infnet.continuum_control.evento.service.EventoService;
 import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
+import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -72,5 +73,18 @@ public class AnomaliaServiceTest {
         anomaliaService.classificarRisco(1L, Risco.CRITICO);
 
         assertEquals(Risco.CRITICO, anomalia.getRisco());
+    }
+
+    @Test
+    void deveLancarExcecaoAoTentarAnalisarAnomaliaIrreversivel() {
+        Evento evento = new Evento("Eleição", "Eleições", LocalDate.parse("2026-10-04"), "Brasil", Importancia.ALTA);
+        Anomalia anomalia = new Anomalia(evento, "Fissura", Risco.ALTO, null, null);
+
+        anomalia.tornarIrreversivel();
+
+        when(anomaliaRepository.findById(1L)).thenReturn(Optional.of(anomalia));
+
+        assertThrows(OperacaoInvalidaException.class,
+                () -> anomaliaService.analisar(1L));
     }
 }

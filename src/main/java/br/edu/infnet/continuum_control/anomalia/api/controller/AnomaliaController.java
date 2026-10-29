@@ -81,4 +81,14 @@ public class AnomaliaController {
                                              @Valid @RequestBody ClassificarRiscoRequest req) {
         return AnomaliaResponse.from(anomaliaService.classificarRisco(id, req.risco()));
     }
+
+    @PatchMapping("/{id}/analise")
+    public AnomaliaResponse analisar(@PathVariable Long id) {
+        return AnomaliaResponse.from(anomaliaService.analisar(id));
+    }
+
+    @PatchMapping("/{id}/irreversivel")
+    public AnomaliaResponse tornarIrreversivel(@PathVariable Long id) {
+        return AnomaliaResponse.from(anomaliaService.tornarIrreversivel(id));
+    }
 }
