@@ -1,6 +1,6 @@
 package br.edu.infnet.continuum_control.missao.api.dto;
 
-import br.edu.infnet.continuum_control.agente.domain.Agente;
+import br.edu.infnet.continuum_control.agente.api.dto.AgenteResponse;
 import br.edu.infnet.continuum_control.missao.domain.Missao;
 import br.edu.infnet.continuum_control.missao.domain.Prioridade;
 import br.edu.infnet.continuum_control.missao.domain.SituacaoMissao;
@@ -16,7 +16,7 @@ public record MissaoResponse(
         LocalDateTime destinoTemporal,
         Prioridade prioridade,
         SituacaoMissao situacao,
-        List<Long> agentes
+        List<AgenteResponse> agentes
 ) {
     public static MissaoResponse from(Missao missao) {
         return new MissaoResponse(
@@ -27,7 +27,7 @@ public record MissaoResponse(
                 missao.getDestinoTemporal(),
                 missao.getPrioridade(),
                 missao.getSituacao(),
-                missao.getAgentes().stream().map(Agente::getId).toList()
+                missao.getAgentes().stream().map(AgenteResponse::from).toList()
         );
     }
 }

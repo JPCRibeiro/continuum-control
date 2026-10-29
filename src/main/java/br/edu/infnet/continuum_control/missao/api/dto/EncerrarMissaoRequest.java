@@ -11,6 +11,4 @@ public record EncerrarMissaoRequest(
         Impacto impacto,
         @NotBlank
         String observacao
-
-
 ) {}

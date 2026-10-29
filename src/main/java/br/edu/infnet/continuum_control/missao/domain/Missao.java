@@ -122,4 +122,18 @@ public class Missao {
         }
         this.situacao = SituacaoMissao.CANCELADA;
     }
+
+    public void validarAceitaIntervencao() {
+        if (situacao != SituacaoMissao.EM_EXECUCAO) {
+            throw new OperacaoInvalidaException(
+                    "Somente missões em execução recebem intervenções. Estado: " + situacao);
+        }
+    }
+
+    public void validarAgenteParticipante(Agente agente) {
+        if (!this.agentes.contains(agente)) {
+            throw new OperacaoInvalidaException(
+                    "O agente " + agente.getCodinome() + " não está designado para esta missão.");
+        }
+    }
 }
