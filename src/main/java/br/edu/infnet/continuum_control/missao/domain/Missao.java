@@ -130,6 +130,13 @@ public class Missao {
         }
     }
 
+    public void validarAceitaOcorrencia() {
+        if (situacao != SituacaoMissao.EM_EXECUCAO) {
+            throw new OperacaoInvalidaException(
+                    "Somente missões em execução recebem ocorrências. Estado: " + situacao);
+        }
+    }
+
     public void validarAgenteParticipante(Agente agente) {
         if (!this.agentes.contains(agente)) {
             throw new OperacaoInvalidaException(
