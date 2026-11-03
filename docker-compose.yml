@@ -1,4 +1,24 @@
 services:
+  app:
+    build: .
+    container_name: continuum-app
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/continuum_control
+      DB_USER: user
+      DB_PASSWORD: dev
+      MONGO_URI: mongodb://mongodb:27017/continuum_control
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   postgres:
     image: postgres:17
     container_name: continuum-postgres
