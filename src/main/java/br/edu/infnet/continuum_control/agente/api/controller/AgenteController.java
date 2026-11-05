@@ -8,6 +8,7 @@ import br.edu.infnet.continuum_control.agente.service.AgenteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class AgenteController {
     private final AgenteService agenteService;
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AgenteResponse registrar(@Valid @RequestBody RegistrarAgenteRequest req) {
@@ -56,6 +58,7 @@ public class AgenteController {
                 .toList();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PutMapping("/{id}")
     public AgenteResponse atualizar(@PathVariable Long id, @Valid @RequestBody RegistrarAgenteRequest req) {
         return AgenteResponse.from(agenteService.atualizar(id, req.codinome(), req.especialidade()));

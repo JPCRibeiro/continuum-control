@@ -6,6 +6,8 @@ import br.edu.infnet.continuum_control.intervencao.service.IntervencaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,9 +21,11 @@ public class IntervencaoController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public IntervencaoResponse registrar(@PathVariable Long missaoId,
-                                         @Valid @RequestBody RegistrarIntervencaoRequest req) {
+                                         @Valid @RequestBody RegistrarIntervencaoRequest req,
+                                         @AuthenticationPrincipal Jwt jwt) {
         return IntervencaoResponse.from(intervencaoService.registrar(
-                missaoId, req.agenteId(), req.acao(), req.justificativa(), req.impacto(), req.resultado()
+                missaoId, req.agenteId(), req.acao(), req.justificativa(), req.impacto(), req.resultado(),
+                jwt.getSubject()
         ));
     }
 

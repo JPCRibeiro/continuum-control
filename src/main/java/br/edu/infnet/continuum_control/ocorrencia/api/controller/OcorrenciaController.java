@@ -6,6 +6,8 @@ import br.edu.infnet.continuum_control.ocorrencia.service.OcorrenciaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,9 +21,11 @@ public class OcorrenciaController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OcorrenciaResponse registrar(@PathVariable Long missaoId,
-                                        @Valid @RequestBody RegistrarOcorrenciaRequest req) {
+                                        @Valid @RequestBody RegistrarOcorrenciaRequest req,
+                                        @AuthenticationPrincipal Jwt jwt) {
         return OcorrenciaResponse.from(ocorrenciaService.registrar(
-                missaoId, req.agenteId(), req.tipo(), req.descricao(), req.distorcao(), req.evidencia())
+                missaoId, req.agenteId(), req.tipo(), req.descricao(), req.distorcao(), req.evidencia(),
+                jwt.getSubject())
         );
     }
 

@@ -11,6 +11,7 @@ import br.edu.infnet.continuum_control.anomalia.service.AnomaliaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 public class AnomaliaController {
     private final AnomaliaService anomaliaService;
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AnomaliaResponse registrar(@Valid @RequestBody RegistrarAnomaliaRequest req) {
@@ -69,6 +71,7 @@ public class AnomaliaController {
                 .toList();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PutMapping("/{id}")
     public AnomaliaResponse atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarAnomaliaRequest req) {
         return AnomaliaResponse.from(
@@ -76,17 +79,20 @@ public class AnomaliaController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PatchMapping("/{id}/risco")
     public AnomaliaResponse classificarRisco(@PathVariable Long id,
                                              @Valid @RequestBody ClassificarRiscoRequest req) {
         return AnomaliaResponse.from(anomaliaService.classificarRisco(id, req.risco()));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PatchMapping("/{id}/analise")
     public AnomaliaResponse analisar(@PathVariable Long id) {
         return AnomaliaResponse.from(anomaliaService.analisar(id));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PatchMapping("/{id}/irreversivel")
     public AnomaliaResponse tornarIrreversivel(@PathVariable Long id) {
         return AnomaliaResponse.from(anomaliaService.tornarIrreversivel(id));

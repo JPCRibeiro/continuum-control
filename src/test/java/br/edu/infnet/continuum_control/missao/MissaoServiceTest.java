@@ -50,13 +50,13 @@ public class MissaoServiceTest {
     @Mock
     private EncerramentoRepository encerramentoRepository;
 
-    @InjectMocks
-    private MissaoService missaoService;
-
     @Mock
     private UsuarioService usuarioService;
 
-    private static final String EMAIL = "supervisor@continuum.gov";
+    @InjectMocks
+    private MissaoService missaoService;
+
+    private static final String EMAIL = "supervisor@continuum.control";
 
     @Test
     void deveIniciarMissaoComSucesso() {
@@ -66,7 +66,7 @@ public class MissaoServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
-        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, agente);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, null);
 
         missao.designar(agente);
 
@@ -88,7 +88,7 @@ public class MissaoServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.EMERGENCIA);
-        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, agente);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, null);
 
         missao.designar(agente);
 
@@ -107,7 +107,7 @@ public class MissaoServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
-        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, agente);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, null);
 
         missao.designar(agente);
         agente.entrarMissao();
@@ -192,13 +192,13 @@ public class MissaoServiceTest {
         missao.designar(agente);
 
         Agente novoAgente = new Agente("yf05mx2m", "Loki", "Viajante");
-        Usuario usuarioNovoAgente = new Usuario("Loki", "loki@continuum.gov", "hash", Perfil.OPERADOR,
+        Usuario usuarioNovoAgente = new Usuario("Loki", "loki@continuum.control", "hash", Perfil.AGENTE,
                 novoAgente);
 
         when(missaoRepository.findById(1L)).thenReturn(Optional.of(missao));
-        when(usuarioService.buscarPorEmail("loki@continuum.gov")).thenReturn(usuarioNovoAgente);
+        when(usuarioService.buscarPorEmail("loki@continuum.control")).thenReturn(usuarioNovoAgente);
 
         assertThrows(AcessoNegadoException.class,
-                () -> missaoService.iniciar(1L, "loki@continuum.gov"));
+                () -> missaoService.iniciar(1L, "loki@continuum.control"));
     }
 }

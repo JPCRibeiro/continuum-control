@@ -13,6 +13,7 @@ import br.edu.infnet.continuum_control.missao.repository.EncerramentoRepository;
 import br.edu.infnet.continuum_control.missao.repository.MissaoRepository;
 import br.edu.infnet.continuum_control.shared.GeradorCodigo;
 import br.edu.infnet.continuum_control.shared.Impacto;
+import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -59,8 +60,8 @@ public class MissaoService {
         Missao missao = buscarPorId(missaoId);
         Usuario usuario = usuarioService.buscarPorEmail(email);
 
-        if (usuario.getAgente() != null) {
-            missao.validarAgenteParticipante(usuario.getAgente());
+        if (usuario.getAgente() != null && !missao.possuiAgente(usuario.getAgente())) {
+            throw new AcessoNegadoException("Agente não participa desta missão.");
         }
 
         missao.iniciar();

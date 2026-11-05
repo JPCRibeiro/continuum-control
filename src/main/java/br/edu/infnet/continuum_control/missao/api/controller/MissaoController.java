@@ -20,6 +20,7 @@ import java.util.List;
 public class MissaoController {
     private final MissaoService missaoService;
 
+    @PreAuthorize("hasAnyRole('OPERADOR', 'SUPERVISOR', 'ADMINISTRADOR')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MissaoResponse registrar(@Valid @RequestBody RegistrarMissaoRequest req) {
@@ -28,6 +29,7 @@ public class MissaoController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('OPERADOR', 'SUPERVISOR', 'ADMINISTRADOR')")
     @PostMapping("/{id}/agentes")
     public MissaoResponse designar(@PathVariable Long id, @Valid @RequestBody DesignarAgenteRequest req) {
         return MissaoResponse.from(missaoService.designar(id, req.agenteId()));
@@ -44,18 +46,21 @@ public class MissaoController {
         return AutorizacaoResponse.from(missaoService.autorizar(id, req.responsavel(), req.observacao()));
     }
 
+    @PreAuthorize("hasAnyRole('OPERADOR', 'SUPERVISOR', 'ADMINISTRADOR')")
     @PostMapping("/{id}/concluir")
     @ResponseStatus(HttpStatus.CREATED)
     public EncerramentoResponse concluir(@PathVariable Long id, @Valid @RequestBody EncerrarMissaoRequest req) {
         return EncerramentoResponse.from(missaoService.concluir(id, req.resumo(), req.impacto(), req.observacao()));
     }
 
+    @PreAuthorize("hasAnyRole('OPERADOR', 'SUPERVISOR', 'ADMINISTRADOR')")
     @PostMapping("/{id}/falhar")
     @ResponseStatus(HttpStatus.CREATED)
     public EncerramentoResponse falhar(@PathVariable Long id, @Valid @RequestBody EncerrarMissaoRequest req) {
         return EncerramentoResponse.from(missaoService.falhar(id, req.resumo(), req.impacto(), req.observacao()));
     }
 
+    @PreAuthorize("hasAnyRole('OPERADOR', 'SUPERVISOR', 'ADMINISTRADOR')")
     @PostMapping("/{id}/cancelar")
     public MissaoResponse cancelar(@PathVariable Long id) {
         return MissaoResponse.from(missaoService.cancelar(id));

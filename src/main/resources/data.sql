@@ -13,8 +13,8 @@ INSERT INTO usuarios (nome, email, senha, perfil) VALUES
 ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO usuarios (nome, email, senha, perfil, agente_id) VALUES
-    ('James Bond', 'bond@continuum.control', '$2a$10$0t26/4kQCEAbaMv7ZI0d/.Ze8s1Il3OTuxQzA9E6rmvlGpZ7WaNS.',
-     'OPERADOR', (SELECT id FROM agentes WHERE codigo = 'agent001')),
-    ('Loki', 'loki@continuum.control', '$2a$10$0t26/4kQCEAbaMv7ZI0d/.Ze8s1Il3OTuxQzA9E6rmvlGpZ7WaNS.',
-     'OPERADOR', (SELECT id FROM agentes WHERE codigo = 'agent002'))
+    ('James Bond', 'bond@continuum.control', '$2a$10$0t26/4kQCEAbaMv7ZI0d/.Ze8s1Il3OTuxQzA9E6rmvlGpZ7WaNS.', 'AGENTE',
+     (SELECT id FROM agentes WHERE codigo = 'agent001')),
+    ('Loki', 'loki@continuum.control', '$2a$10$0t26/4kQCEAbaMv7ZI0d/.Ze8s1Il3OTuxQzA9E6rmvlGpZ7WaNS.', 'AGENTE',
+     (SELECT id FROM agentes WHERE codigo = 'agent002'))
 ON CONFLICT (email) DO NOTHING;

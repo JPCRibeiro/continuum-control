@@ -4,6 +4,9 @@ import br.edu.infnet.continuum_control.agente.domain.Agente;
 import br.edu.infnet.continuum_control.agente.service.AgenteService;
 import br.edu.infnet.continuum_control.anomalia.domain.Anomalia;
 import br.edu.infnet.continuum_control.anomalia.domain.Risco;
+import br.edu.infnet.continuum_control.auth.domain.Perfil;
+import br.edu.infnet.continuum_control.auth.domain.Usuario;
+import br.edu.infnet.continuum_control.auth.service.UsuarioService;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
 import br.edu.infnet.continuum_control.intervencao.domain.Intervencao;
@@ -12,7 +15,6 @@ import br.edu.infnet.continuum_control.intervencao.repository.IntervencaoReposit
 import br.edu.infnet.continuum_control.intervencao.service.IntervencaoService;
 import br.edu.infnet.continuum_control.missao.service.MissaoService;
 import br.edu.infnet.continuum_control.shared.Impacto;
-import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,8 +40,13 @@ public class IntervencaoServiceTest {
     @Mock
     private AgenteService agenteService;
 
+    @Mock
+    private UsuarioService usuarioService;
+
     @InjectMocks
     private IntervencaoService intervencaoService;
+
+    private static final String EMAIL = "supervisor@continuum.control";
 
     @Test
     void deveRegistrarIntervencaoComSucesso() {
@@ -49,12 +56,14 @@ public class IntervencaoServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, null);
 
         missao.designar(agente);
         missao.iniciar();
         agente.entrarMissao();
 
         when(missaoService.buscarPorId(1L)).thenReturn(missao);
+        when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
         when(agenteService.buscarPorId(1L)).thenReturn(agente);
         when(intervencaoRepository.save(any(Intervencao.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
@@ -62,7 +71,7 @@ public class IntervencaoServiceTest {
         Intervencao intervencao = intervencaoService.registrar(1L, 1L,
                 "Substituição da fita original pela cópia restaurada",
                 "Impedir que a divergência se propague no registro histórico", Impacto.CONTROLADO,
-                "Transmissão restaurada sem efeitos colaterais detectados");
+                "Transmissão restaurada sem efeitos colaterais detectados", EMAIL);
 
         assertEquals(missao, intervencao.getMissao());
         assertEquals(agente, intervencao.getAgente());
@@ -76,12 +85,14 @@ public class IntervencaoServiceTest {
         Anomalia anomalia = new Anomalia(evento, "Fissura", Risco.ALTO, null, null);
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, null);
 
         when(missaoService.buscarPorId(1L)).thenReturn(missao);
+        when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
 
         assertThrows(OperacaoInvalidaException.class,
                 () -> intervencaoService.registrar(1L, 1L, "Substituição da fita",
-                        "Impedir propagação da divergência", Impacto.CONTROLADO, "Restaurada"));
+                        "Impedir propagação da divergência", Impacto.CONTROLADO, "Restaurada", EMAIL));
     }
 
     @Test
@@ -92,6 +103,7 @@ public class IntervencaoServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, null);
 
         missao.designar(agente);
         missao.iniciar();
@@ -99,10 +111,11 @@ public class IntervencaoServiceTest {
         Agente novoAgente = new Agente("yf05mx2m", "Loki", "Viajante");
 
         when(missaoService.buscarPorId(1L)).thenReturn(missao);
+        when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
         when(agenteService.buscarPorId(2L)).thenReturn(novoAgente);
 
-        assertThrows(AcessoNegadoException.class,
+        assertThrows(OperacaoInvalidaException.class,
                 () -> intervencaoService.registrar(1L, 2L, "Substituição da fita",
-                        "Impedir propagação da divergência", Impacto.CONTROLADO, "Restaurada"));
+                        "Impedir propagação da divergência", Impacto.CONTROLADO, "Restaurada", EMAIL));
     }
 }

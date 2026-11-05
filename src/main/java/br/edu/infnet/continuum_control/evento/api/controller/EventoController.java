@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import java.util.List;
 public class EventoController {
     private final EventoService eventoService;
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventoResponse registrar(@Valid @RequestBody RegistrarEventoRequest req) {
@@ -55,6 +57,7 @@ public class EventoController {
         return eventos.stream().map(EventoResponse::from).toList();
     }
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PutMapping("/{id}")
     public EventoResponse atualizar(@PathVariable Long id, @Valid @RequestBody RegistrarEventoRequest req) {
         return EventoResponse.from(eventoService.atualizar(

@@ -4,6 +4,9 @@ import br.edu.infnet.continuum_control.agente.domain.Agente;
 import br.edu.infnet.continuum_control.agente.service.AgenteService;
 import br.edu.infnet.continuum_control.anomalia.domain.Anomalia;
 import br.edu.infnet.continuum_control.anomalia.domain.Risco;
+import br.edu.infnet.continuum_control.auth.domain.Perfil;
+import br.edu.infnet.continuum_control.auth.domain.Usuario;
+import br.edu.infnet.continuum_control.auth.service.UsuarioService;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
 import br.edu.infnet.continuum_control.missao.domain.Missao;
@@ -14,7 +17,6 @@ import br.edu.infnet.continuum_control.ocorrencia.domain.Ocorrencia;
 import br.edu.infnet.continuum_control.ocorrencia.domain.Tipo;
 import br.edu.infnet.continuum_control.ocorrencia.repository.OcorrenciaRepository;
 import br.edu.infnet.continuum_control.ocorrencia.service.OcorrenciaService;
-import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,8 +44,13 @@ public class OcorrenciaServiceTest {
     @Mock
     private AgenteService agenteService;
 
+    @Mock
+    private UsuarioService usuarioService;
+
     @InjectMocks
     private OcorrenciaService ocorrenciaService;
+
+    private static final String EMAIL = "supervisor@continuum.control";
 
     @Test
     void deveRegistrarOcorrenciaComSucesso() {
@@ -53,19 +60,21 @@ public class OcorrenciaServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, null);
 
         missao.designar(agente);
         missao.iniciar();
         agente.entrarMissao();
 
         when(missaoService.buscarPorId(1L)).thenReturn(missao);
+        when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
         when(agenteService.buscarPorId(1L)).thenReturn(agente);
         when(ocorrenciaRepository.save(any(Ocorrencia.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
         Ocorrencia ocorrencia = ocorrenciaService.registrar(1L, 1L, Tipo.DISTORCAO_TEMPORAL,
                 "Oscilação detectada no campo temporal durante a transmissão",
-                new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null);
+                new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null, EMAIL);
 
         assertEquals(1L, ocorrencia.getMissaoId());
         assertEquals(1L, ocorrencia.getAgenteId());
@@ -80,13 +89,15 @@ public class OcorrenciaServiceTest {
         Anomalia anomalia = new Anomalia(evento, "Fissura", Risco.ALTO, null, null);
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, null);
 
         when(missaoService.buscarPorId(1L)).thenReturn(missao);
+        when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
 
         assertThrows(OperacaoInvalidaException.class,
                 () -> ocorrenciaService.registrar(1L, 1L, Tipo.DISTORCAO_TEMPORAL,
                         "Oscilação detectada no campo temporal durante a transmissão",
-                        new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null));
+                        new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null, EMAIL));
     }
 
     @Test
@@ -97,6 +108,7 @@ public class OcorrenciaServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, null);
 
         missao.designar(agente);
         missao.iniciar();
@@ -104,11 +116,12 @@ public class OcorrenciaServiceTest {
         Agente novoAgente = new Agente("yf05mx2m", "Loki", "Viajante");
 
         when(missaoService.buscarPorId(1L)).thenReturn(missao);
+        when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
         when(agenteService.buscarPorId(2L)).thenReturn(novoAgente);
 
-        assertThrows(AcessoNegadoException.class,
+        assertThrows(OperacaoInvalidaException.class,
                 () -> ocorrenciaService.registrar(1L, 2L, Tipo.DISTORCAO_TEMPORAL,
                         "Oscilação detectada no campo temporal durante a transmissão",
-                        new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null));
+                        new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null, EMAIL));
     }
 }
