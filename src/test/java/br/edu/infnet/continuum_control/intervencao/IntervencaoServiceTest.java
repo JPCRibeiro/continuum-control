@@ -12,6 +12,7 @@ import br.edu.infnet.continuum_control.intervencao.repository.IntervencaoReposit
 import br.edu.infnet.continuum_control.intervencao.service.IntervencaoService;
 import br.edu.infnet.continuum_control.missao.service.MissaoService;
 import br.edu.infnet.continuum_control.shared.Impacto;
+import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -100,7 +101,7 @@ public class IntervencaoServiceTest {
         when(missaoService.buscarPorId(1L)).thenReturn(missao);
         when(agenteService.buscarPorId(2L)).thenReturn(novoAgente);
 
-        assertThrows(OperacaoInvalidaException.class,
+        assertThrows(AcessoNegadoException.class,
                 () -> intervencaoService.registrar(1L, 2L, "Substituição da fita",
                         "Impedir propagação da divergência", Impacto.CONTROLADO, "Restaurada"));
     }

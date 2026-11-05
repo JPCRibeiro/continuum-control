@@ -3,6 +3,7 @@ package br.edu.infnet.continuum_control.missao.domain;
 import br.edu.infnet.continuum_control.agente.domain.Agente;
 import br.edu.infnet.continuum_control.anomalia.domain.Anomalia;
 import br.edu.infnet.continuum_control.anomalia.domain.Risco;
+import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -139,8 +140,7 @@ public class Missao {
 
     public void validarAgenteParticipante(Agente agente) {
         if (!this.agentes.contains(agente)) {
-            throw new OperacaoInvalidaException(
-                    "O agente " + agente.getCodinome() + " não está designado para esta missão.");
+            throw new AcessoNegadoException("Agente não participa desta missão.");
         }
     }
 }

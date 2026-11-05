@@ -7,6 +7,9 @@ import br.edu.infnet.continuum_control.missao.service.MissaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,10 +34,11 @@ public class MissaoController {
     }
 
     @PostMapping("/{id}/iniciar")
-    public MissaoResponse iniciar(@PathVariable Long id) {
-        return MissaoResponse.from(missaoService.iniciar(id));
+    public MissaoResponse iniciar(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        return MissaoResponse.from(missaoService.iniciar(id, jwt.getSubject()));
     }
 
+    @PreAuthorize("hasAnyRole('SUPERVISOR', 'ADMINISTRADOR')")
     @PostMapping("/{id}/autorizar")
     public AutorizacaoResponse autorizar(@PathVariable Long id, @Valid @RequestBody AutorizarMissaoRequest req) {
         return AutorizacaoResponse.from(missaoService.autorizar(id, req.responsavel(), req.observacao()));

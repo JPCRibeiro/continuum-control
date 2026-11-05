@@ -5,6 +5,8 @@ import br.edu.infnet.continuum_control.agente.service.AgenteService;
 import br.edu.infnet.continuum_control.anomalia.domain.Anomalia;
 import br.edu.infnet.continuum_control.anomalia.domain.SituacaoAnomalia;
 import br.edu.infnet.continuum_control.anomalia.service.AnomaliaService;
+import br.edu.infnet.continuum_control.auth.domain.Usuario;
+import br.edu.infnet.continuum_control.auth.service.UsuarioService;
 import br.edu.infnet.continuum_control.missao.domain.*;
 import br.edu.infnet.continuum_control.missao.repository.AutorizacaoRepository;
 import br.edu.infnet.continuum_control.missao.repository.EncerramentoRepository;
@@ -28,6 +30,7 @@ public class MissaoService {
     private final AgenteService agenteService;
     private final AutorizacaoRepository autorizacaoRepository;
     private final EncerramentoRepository encerramentoRepository;
+    private final UsuarioService usuarioService;
 
     public Missao registrar(String objetivo, Long anomaliaId, LocalDateTime destinoTemporal,
                             Prioridade prioridade) {
@@ -52,8 +55,14 @@ public class MissaoService {
     }
 
     @Transactional
-    public Missao iniciar(Long missaoId) {
+    public Missao iniciar(Long missaoId, String email) {
         Missao missao = buscarPorId(missaoId);
+        Usuario usuario = usuarioService.buscarPorEmail(email);
+
+        if (usuario.getAgente() != null) {
+            missao.validarAgenteParticipante(usuario.getAgente());
+        }
+
         missao.iniciar();
         missao.getAnomalia().iniciarCorrecao();
         missao.getAgentes().forEach(Agente::entrarMissao);

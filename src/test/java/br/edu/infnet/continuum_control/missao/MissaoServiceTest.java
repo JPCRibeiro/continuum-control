@@ -7,6 +7,9 @@ import br.edu.infnet.continuum_control.anomalia.domain.Anomalia;
 import br.edu.infnet.continuum_control.anomalia.domain.Risco;
 import br.edu.infnet.continuum_control.anomalia.domain.SituacaoAnomalia;
 import br.edu.infnet.continuum_control.anomalia.service.AnomaliaService;
+import br.edu.infnet.continuum_control.auth.domain.Perfil;
+import br.edu.infnet.continuum_control.auth.domain.Usuario;
+import br.edu.infnet.continuum_control.auth.service.UsuarioService;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
 import br.edu.infnet.continuum_control.shared.Impacto;
@@ -16,6 +19,7 @@ import br.edu.infnet.continuum_control.missao.domain.SituacaoMissao;
 import br.edu.infnet.continuum_control.missao.repository.EncerramentoRepository;
 import br.edu.infnet.continuum_control.missao.repository.MissaoRepository;
 import br.edu.infnet.continuum_control.missao.service.MissaoService;
+import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,6 +53,11 @@ public class MissaoServiceTest {
     @InjectMocks
     private MissaoService missaoService;
 
+    @Mock
+    private UsuarioService usuarioService;
+
+    private static final String EMAIL = "supervisor@continuum.gov";
+
     @Test
     void deveIniciarMissaoComSucesso() {
         Evento evento = new Evento("Eleição", "Eleições no Brasil", LocalDate.parse("2026-10-04"), "Brasil",
@@ -57,12 +66,14 @@ public class MissaoServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, agente);
 
         missao.designar(agente);
 
         when(missaoRepository.findById(1L)).thenReturn(Optional.of(missao));
+        when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
 
-        missaoService.iniciar(1L);
+        missaoService.iniciar(1L, EMAIL);
 
         assertEquals(SituacaoMissao.EM_EXECUCAO, missao.getSituacao());
         assertEquals(SituacaoAgente.EM_MISSAO, agente.getSituacao());
@@ -77,13 +88,15 @@ public class MissaoServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.EMERGENCIA);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, agente);
 
         missao.designar(agente);
 
         when(missaoRepository.findById(1L)).thenReturn(Optional.of(missao));
+        when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
 
         assertThrows(OperacaoInvalidaException.class,
-                () -> missaoService.iniciar(1L));
+                () -> missaoService.iniciar(1L, EMAIL));
     }
 
     @Test
@@ -94,14 +107,16 @@ public class MissaoServiceTest {
         Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
         Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
                 LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
+        Usuario supervisor = new Usuario("Supervisor", EMAIL, "hash", Perfil.SUPERVISOR, agente);
 
         missao.designar(agente);
         agente.entrarMissao();
 
         when(missaoRepository.findById(1L)).thenReturn(Optional.of(missao));
+        when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
 
         assertThrows(OperacaoInvalidaException.class,
-                () -> missaoService.iniciar(1L));
+                () -> missaoService.iniciar(1L, EMAIL));
     }
 
     @Test
@@ -163,5 +178,27 @@ public class MissaoServiceTest {
         assertEquals(SituacaoMissao.CONCLUIDA, missao.getSituacao());
         assertEquals(SituacaoAgente.DISPONIVEL, agente.getSituacao());
         assertEquals(SituacaoAnomalia.ESTABILIZADA, anomalia.getSituacao());
+    }
+
+    @Test
+    void naoDeveIniciarMissaoSeAgenteNaoParticipa() {
+        Evento evento = new Evento("Eleição", "Eleições no Brasil", LocalDate.parse("2026-10-04"), "Brasil",
+                Importancia.ALTA);
+        Anomalia anomalia = new Anomalia(evento, "Fissura", Risco.ALTO, null, null);
+        Agente agente = new Agente("ns02m9qm", "James Bond", "Espionagem");
+        Missao missao = new Missao("dsav231n", "Verificar fissura", anomalia,
+                LocalDateTime.parse("2026-10-04T20:17"), Prioridade.ALTA);
+
+        missao.designar(agente);
+
+        Agente novoAgente = new Agente("yf05mx2m", "Loki", "Viajante");
+        Usuario usuarioNovoAgente = new Usuario("Loki", "loki@continuum.gov", "hash", Perfil.OPERADOR,
+                novoAgente);
+
+        when(missaoRepository.findById(1L)).thenReturn(Optional.of(missao));
+        when(usuarioService.buscarPorEmail("loki@continuum.gov")).thenReturn(usuarioNovoAgente);
+
+        assertThrows(AcessoNegadoException.class,
+                () -> missaoService.iniciar(1L, "loki@continuum.gov"));
     }
 }

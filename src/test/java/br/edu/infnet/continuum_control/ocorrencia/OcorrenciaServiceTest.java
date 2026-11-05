@@ -14,6 +14,7 @@ import br.edu.infnet.continuum_control.ocorrencia.domain.Ocorrencia;
 import br.edu.infnet.continuum_control.ocorrencia.domain.Tipo;
 import br.edu.infnet.continuum_control.ocorrencia.repository.OcorrenciaRepository;
 import br.edu.infnet.continuum_control.ocorrencia.service.OcorrenciaService;
+import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -105,7 +106,7 @@ public class OcorrenciaServiceTest {
         when(missaoService.buscarPorId(1L)).thenReturn(missao);
         when(agenteService.buscarPorId(2L)).thenReturn(novoAgente);
 
-        assertThrows(OperacaoInvalidaException.class,
+        assertThrows(AcessoNegadoException.class,
                 () -> ocorrenciaService.registrar(1L, 2L, Tipo.DISTORCAO_TEMPORAL,
                         "Oscilação detectada no campo temporal durante a transmissão",
                         new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null));

@@ -16,12 +16,20 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
   mongodb:
     uri: ${MONGO_URI:mongodb://localhost:27017/continuum_control}
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY:continuum-control-chave-de-desenvolvimento}
+  access-token-ttl: ${JWT_TTL:PT2H}
 
 management:
   endpoints:
