@@ -44,9 +44,9 @@ public class EstadoOperacionalService {
         );
     }
 
-    private int calcularIndice(long anomaliasAtivas, long anomaliasCriticas, long missaoesEmExecucao,
+    private int calcularIndice(long anomaliasAtivas, long anomaliasCriticas, long missoesEmExecucao,
                               long missoesFalhadas, long intervencoesSeveras) {
-        long indice = 100 - (anomaliasAtivas * 3) - (anomaliasCriticas * 30) - (missaoesEmExecucao * 2)
+        long indice = 100 - (anomaliasAtivas * 3) - (anomaliasCriticas * 15) - (missoesEmExecucao * 2)
                 - (missoesFalhadas * 8) - (intervencoesSeveras * 5);
 
         return Math.clamp(indice, 0, 100);

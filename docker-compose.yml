@@ -11,6 +11,7 @@ services:
       MONGO_URI: mongodb://mongodb:27017/continuum_control
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      JWT_SECRET_KEY: continuum-control-chave-de-producao
     depends_on:
       postgres:
         condition: service_healthy
@@ -28,8 +29,6 @@ services:
       POSTGRES_PASSWORD: dev
     ports:
       - "5432:5432"
-    volumes:
-      - continuum-postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U user -d continuum_control" ]
       interval: 5s
@@ -41,8 +40,6 @@ services:
     container_name: continuum-mongodb
     ports:
       - "27017:27017"
-    volumes:
-      - continuum-mongodb-data:/data/db
     healthcheck:
       test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
@@ -59,7 +56,3 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-volumes:
-  continuum-postgres-data:
-  continuum-mongodb-data:

@@ -19,7 +19,7 @@ public class AnomaliaService {
     private final AnomaliaRepository anomaliaRepository;
     private final EventoService eventoService;
 
-    private final List<SituacaoAnomalia> ATIVAS = List.of(
+    private static final List<SituacaoAnomalia> ATIVAS = List.of(
         SituacaoAnomalia.DETECTADA,
         SituacaoAnomalia.EM_ANALISE,
         SituacaoAnomalia.CONFIRMADA,
