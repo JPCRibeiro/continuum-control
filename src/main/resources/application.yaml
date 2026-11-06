@@ -26,6 +26,8 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+  cache:
+    type: redis
 
 jwt:
   secret-key: ${JWT_SECRET_KEY:continuum-control-chave-de-desenvolvimento}

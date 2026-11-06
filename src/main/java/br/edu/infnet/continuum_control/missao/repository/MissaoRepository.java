@@ -25,4 +25,6 @@ public interface MissaoRepository extends JpaRepository<Missao, Long> {
 
     @EntityGraph(attributePaths = "agentes")
     List<Missao> findByAgentesId(Long agenteId);
+
+    long countBySituacao(SituacaoMissao situacao);
 }

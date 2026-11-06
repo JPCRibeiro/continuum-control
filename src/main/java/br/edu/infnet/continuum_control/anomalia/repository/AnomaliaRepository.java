@@ -10,7 +10,13 @@ import java.util.List;
 public interface AnomaliaRepository extends JpaRepository<Anomalia, Long> {
     List<Anomalia> findBySituacaoIn(List<SituacaoAnomalia> situacoes);
 
+    List<Anomalia> findBySituacaoInAndRisco(List<SituacaoAnomalia> situacoes, Risco risco);
+
     List<Anomalia> findByRisco(Risco risco);
 
     List<Anomalia> findBySituacao(SituacaoAnomalia situacao);
+
+    long countBySituacaoIn(List<SituacaoAnomalia> situacoes);
+
+    long countBySituacaoInAndRisco(List<SituacaoAnomalia> situacoes, Risco risco);
 }

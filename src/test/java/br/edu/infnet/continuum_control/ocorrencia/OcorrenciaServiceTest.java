@@ -83,7 +83,7 @@ public class OcorrenciaServiceTest {
     }
 
     @Test
-    void naoDeveRegistrarIntervencaoSeNaoForEmExecucao() {
+    void naoDeveRegistrarOcorrenciaSeNaoForEmExecucao() {
         Evento evento = new Evento("Eleição", "Eleições no Brasil", LocalDate.parse("2026-10-04"), "Brasil",
                 Importancia.ALTA);
         Anomalia anomalia = new Anomalia(evento, "Fissura", Risco.ALTO, null, null);
@@ -101,7 +101,7 @@ public class OcorrenciaServiceTest {
     }
 
     @Test
-    void naoDeveRegistrarIntervencaoDeAgenteNaoDesignado() {
+    void naoDeveRegistrarOcorrenciaDeAgenteNaoDesignado() {
         Evento evento = new Evento("Eleição", "Eleições no Brasil", LocalDate.parse("2026-10-04"), "Brasil",
                 Importancia.ALTA);
         Anomalia anomalia = new Anomalia(evento, "Fissura", Risco.ALTO, null, null);

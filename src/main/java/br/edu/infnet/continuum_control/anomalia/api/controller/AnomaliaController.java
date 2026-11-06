@@ -46,7 +46,7 @@ public class AnomaliaController {
 
     @GetMapping("/criticas")
     public List<AnomaliaResponse> listarCriticas() {
-        return anomaliaService.listarCriticas()
+        return anomaliaService.listarCriticasAtivas()
                 .stream()
                 .map(AnomaliaResponse::from)
                 .toList();

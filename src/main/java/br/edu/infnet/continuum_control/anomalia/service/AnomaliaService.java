@@ -19,6 +19,13 @@ public class AnomaliaService {
     private final AnomaliaRepository anomaliaRepository;
     private final EventoService eventoService;
 
+    private final List<SituacaoAnomalia> ATIVAS = List.of(
+        SituacaoAnomalia.DETECTADA,
+        SituacaoAnomalia.EM_ANALISE,
+        SituacaoAnomalia.CONFIRMADA,
+        SituacaoAnomalia.EM_CORRECAO
+    );
+
     public Anomalia registrar(Long eventoId, String divergencia, Risco risco, String origem, String observacao) {
         Evento evento = eventoService.buscarPorId(eventoId);
         Anomalia anomalia = new Anomalia(evento, divergencia, risco, origem, observacao);
@@ -36,17 +43,11 @@ public class AnomaliaService {
     }
 
     public List<Anomalia> listarAtivas() {
-        return anomaliaRepository.findBySituacaoIn(
-                List.of(
-                        SituacaoAnomalia.DETECTADA,
-                        SituacaoAnomalia.EM_ANALISE,
-                        SituacaoAnomalia.CONFIRMADA,
-                        SituacaoAnomalia.EM_CORRECAO
-        ));
+        return anomaliaRepository.findBySituacaoIn(ATIVAS);
     }
 
-    public List<Anomalia> listarCriticas() {
-        return listarPorRisco(Risco.CRITICO);
+    public List<Anomalia> listarCriticasAtivas() {
+        return anomaliaRepository.findBySituacaoInAndRisco(ATIVAS, Risco.CRITICO);
     }
 
     public List<Anomalia> listarPorSituacao(SituacaoAnomalia situacao) {
@@ -89,5 +90,13 @@ public class AnomaliaService {
         anomalia.tornarIrreversivel();
 
         return anomalia;
+    }
+
+    public long contarAtivas() {
+        return anomaliaRepository.countBySituacaoIn(ATIVAS);
+    }
+
+    public long contarCriticasAtivas() {
+        return anomaliaRepository.countBySituacaoInAndRisco(ATIVAS, Risco.CRITICO);
     }
 }

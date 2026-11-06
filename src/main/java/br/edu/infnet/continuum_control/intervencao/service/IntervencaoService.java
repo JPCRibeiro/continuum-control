@@ -48,4 +48,8 @@ public class IntervencaoService {
 
         return intervencaoRepository.findByMissaoId(missaoId);
     }
+
+    public long contarSeveras() {
+        return intervencaoRepository.countByImpacto(Impacto.SEVERO);
+    }
  }

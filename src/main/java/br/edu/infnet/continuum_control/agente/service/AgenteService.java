@@ -60,4 +60,8 @@ public class AgenteService {
 
         return agente;
     }
+
+    public long contarPorSituacao(SituacaoAgente situacao) {
+        return agenteRepository.countBySituacao(situacao);
+    }
 }

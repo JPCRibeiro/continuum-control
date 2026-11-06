@@ -141,4 +141,8 @@ public class MissaoService {
     public List<Missao> listarPorAgente(Long agenteId) {
         return missaoRepository.findByAgentesId(agenteId);
     }
+
+    public long contarPorSituacao(SituacaoMissao situacao) {
+        return missaoRepository.countBySituacao(situacao);
+    }
 }
