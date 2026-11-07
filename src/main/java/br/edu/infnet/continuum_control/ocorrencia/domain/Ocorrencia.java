@@ -11,14 +11,14 @@ public class Ocorrencia {
     private String id;
     private Long missaoId;
     private Long agenteId;
-    private Tipo tipo;
+    private TipoOcorrencia tipo;
     private String descricao;
     private DistorcaoTemporal distorcao;
     private EvidenciaTemporal evidencia;
 
     protected Ocorrencia() {}
 
-    public Ocorrencia(Long missaoId, Long agenteId, Tipo tipo, String descricao, DistorcaoTemporal distorcao,
+    public Ocorrencia(Long missaoId, Long agenteId, TipoOcorrencia tipo, String descricao, DistorcaoTemporal distorcao,
                       EvidenciaTemporal evidencia) {
         this.missaoId = missaoId;
         this.agenteId = agenteId;

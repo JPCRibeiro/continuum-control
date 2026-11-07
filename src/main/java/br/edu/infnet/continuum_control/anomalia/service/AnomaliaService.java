@@ -6,6 +6,8 @@ import br.edu.infnet.continuum_control.anomalia.domain.SituacaoAnomalia;
 import br.edu.infnet.continuum_control.anomalia.repository.AnomaliaRepository;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.service.EventoService;
+import br.edu.infnet.continuum_control.historico.domain.TipoHistorico;
+import br.edu.infnet.continuum_control.historico.service.HistoricoService;
 import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.List;
 public class AnomaliaService {
     private final AnomaliaRepository anomaliaRepository;
     private final EventoService eventoService;
+    private final HistoricoService historicoService;
 
     private static final List<SituacaoAnomalia> ATIVAS = List.of(
         SituacaoAnomalia.DETECTADA,
@@ -26,11 +29,17 @@ public class AnomaliaService {
         SituacaoAnomalia.EM_CORRECAO
     );
 
+    @Transactional
     public Anomalia registrar(Long eventoId, String divergencia, Risco risco, String origem, String observacao) {
         Evento evento = eventoService.buscarPorId(eventoId);
-        Anomalia anomalia = new Anomalia(evento, divergencia, risco, origem, observacao);
 
-        return anomaliaRepository.save(anomalia);
+        Anomalia anomalia = new Anomalia(evento, divergencia, risco, origem, observacao);
+        anomaliaRepository.save(anomalia);
+
+        historicoService.registrar(anomalia, TipoHistorico.ANOMALIA,
+                "Anomalia registrada no evento " + evento.getAcontecimento() + "com risco" + risco);
+
+        return anomalia;
     }
 
     public List<Anomalia> listar() {
@@ -71,7 +80,11 @@ public class AnomaliaService {
     @Transactional
     public Anomalia classificarRisco(Long id, Risco risco) {
         Anomalia anomalia = buscarPorId(id);
+        Risco anterior = anomalia.getRisco();
         anomalia.classificarRisco(risco);
+
+        historicoService.registrar(anomalia, TipoHistorico.RISCO_ALTERADO,
+                "Risco alterado de " + anterior + " para " + risco);
 
         return anomalia;
     }
@@ -81,6 +94,8 @@ public class AnomaliaService {
         Anomalia anomalia = buscarPorId(id);
         anomalia.analisar();
 
+        historicoService.registrar(anomalia, TipoHistorico.SITUACAO_ALTERADA, "Anomalia movida para análise");
+
         return anomalia;
     }
 
@@ -88,6 +103,8 @@ public class AnomaliaService {
     public Anomalia tornarIrreversivel(Long id) {
         Anomalia anomalia = buscarPorId(id);
         anomalia.tornarIrreversivel();
+
+        historicoService.registrar(anomalia, TipoHistorico.SITUACAO_ALTERADA, "Anomalia declarada irreversível");
 
         return anomalia;
     }

@@ -12,6 +12,7 @@ import br.edu.infnet.continuum_control.auth.domain.Usuario;
 import br.edu.infnet.continuum_control.auth.service.UsuarioService;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
+import br.edu.infnet.continuum_control.historico.service.HistoricoService;
 import br.edu.infnet.continuum_control.shared.Impacto;
 import br.edu.infnet.continuum_control.missao.domain.Missao;
 import br.edu.infnet.continuum_control.missao.domain.Prioridade;
@@ -52,6 +53,9 @@ public class MissaoServiceTest {
 
     @Mock
     private UsuarioService usuarioService;
+
+    @Mock
+    private HistoricoService historicoService;
 
     @InjectMocks
     private MissaoService missaoService;

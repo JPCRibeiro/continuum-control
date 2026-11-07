@@ -1,6 +1,6 @@
 package br.edu.infnet.continuum_control.ocorrencia.domain;
 
-public enum Tipo {
+public enum TipoOcorrencia {
     OBSERVACAO_HISTORICA,
     ALTERACAO_DETECTADA,
     EVIDENCIA_TEMPORAL,

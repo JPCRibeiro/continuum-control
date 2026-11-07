@@ -8,6 +8,7 @@ import br.edu.infnet.continuum_control.anomalia.service.AnomaliaService;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
 import br.edu.infnet.continuum_control.evento.service.EventoService;
+import br.edu.infnet.continuum_control.historico.service.HistoricoService;
 import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
 import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,9 @@ public class AnomaliaServiceTest {
 
     @Mock
     private EventoService eventoService;
+
+    @Mock
+    private HistoricoService historicoService;
 
     @InjectMocks
     private AnomaliaService anomaliaService;

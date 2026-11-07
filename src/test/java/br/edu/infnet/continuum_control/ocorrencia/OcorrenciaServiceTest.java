@@ -9,12 +9,13 @@ import br.edu.infnet.continuum_control.auth.domain.Usuario;
 import br.edu.infnet.continuum_control.auth.service.UsuarioService;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
+import br.edu.infnet.continuum_control.historico.service.HistoricoService;
 import br.edu.infnet.continuum_control.missao.domain.Missao;
 import br.edu.infnet.continuum_control.missao.domain.Prioridade;
 import br.edu.infnet.continuum_control.missao.service.MissaoService;
 import br.edu.infnet.continuum_control.ocorrencia.domain.DistorcaoTemporal;
 import br.edu.infnet.continuum_control.ocorrencia.domain.Ocorrencia;
-import br.edu.infnet.continuum_control.ocorrencia.domain.Tipo;
+import br.edu.infnet.continuum_control.ocorrencia.domain.TipoOcorrencia;
 import br.edu.infnet.continuum_control.ocorrencia.repository.OcorrenciaRepository;
 import br.edu.infnet.continuum_control.ocorrencia.service.OcorrenciaService;
 import br.edu.infnet.continuum_control.shared.api.OperacaoInvalidaException;
@@ -47,6 +48,9 @@ public class OcorrenciaServiceTest {
     @Mock
     private UsuarioService usuarioService;
 
+    @Mock
+    private HistoricoService historicoService;
+
     @InjectMocks
     private OcorrenciaService ocorrenciaService;
 
@@ -72,13 +76,13 @@ public class OcorrenciaServiceTest {
         when(ocorrenciaRepository.save(any(Ocorrencia.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
-        Ocorrencia ocorrencia = ocorrenciaService.registrar(1L, 1L, Tipo.DISTORCAO_TEMPORAL,
+        Ocorrencia ocorrencia = ocorrenciaService.registrar(1L, 1L, TipoOcorrencia.DISTORCAO_TEMPORAL,
                 "Oscilação detectada no campo temporal durante a transmissão",
                 new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null, EMAIL);
 
         assertEquals(1L, ocorrencia.getMissaoId());
         assertEquals(1L, ocorrencia.getAgenteId());
-        assertEquals(Tipo.DISTORCAO_TEMPORAL, ocorrencia.getTipo());
+        assertEquals(TipoOcorrencia.DISTORCAO_TEMPORAL, ocorrencia.getTipo());
         assertEquals(7.5, ocorrencia.getDistorcao().intensidade());
     }
 
@@ -95,7 +99,7 @@ public class OcorrenciaServiceTest {
         when(usuarioService.buscarPorEmail(EMAIL)).thenReturn(supervisor);
 
         assertThrows(OperacaoInvalidaException.class,
-                () -> ocorrenciaService.registrar(1L, 1L, Tipo.DISTORCAO_TEMPORAL,
+                () -> ocorrenciaService.registrar(1L, 1L, TipoOcorrencia.DISTORCAO_TEMPORAL,
                         "Oscilação detectada no campo temporal durante a transmissão",
                         new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null, EMAIL));
     }
@@ -120,7 +124,7 @@ public class OcorrenciaServiceTest {
         when(agenteService.buscarPorId(2L)).thenReturn(novoAgente);
 
         assertThrows(OperacaoInvalidaException.class,
-                () -> ocorrenciaService.registrar(1L, 2L, Tipo.DISTORCAO_TEMPORAL,
+                () -> ocorrenciaService.registrar(1L, 2L, TipoOcorrencia.DISTORCAO_TEMPORAL,
                         "Oscilação detectada no campo temporal durante a transmissão",
                         new DistorcaoTemporal(7.5, Duration.parse("PT1H30M")), null, EMAIL));
     }

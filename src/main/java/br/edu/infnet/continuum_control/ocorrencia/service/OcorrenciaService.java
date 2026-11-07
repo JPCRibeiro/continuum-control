@@ -4,12 +4,14 @@ import br.edu.infnet.continuum_control.agente.domain.Agente;
 import br.edu.infnet.continuum_control.agente.service.AgenteService;
 import br.edu.infnet.continuum_control.auth.domain.Usuario;
 import br.edu.infnet.continuum_control.auth.service.UsuarioService;
+import br.edu.infnet.continuum_control.historico.domain.TipoHistorico;
+import br.edu.infnet.continuum_control.historico.service.HistoricoService;
 import br.edu.infnet.continuum_control.missao.domain.Missao;
 import br.edu.infnet.continuum_control.missao.service.MissaoService;
 import br.edu.infnet.continuum_control.ocorrencia.domain.DistorcaoTemporal;
 import br.edu.infnet.continuum_control.ocorrencia.domain.EvidenciaTemporal;
 import br.edu.infnet.continuum_control.ocorrencia.domain.Ocorrencia;
-import br.edu.infnet.continuum_control.ocorrencia.domain.Tipo;
+import br.edu.infnet.continuum_control.ocorrencia.domain.TipoOcorrencia;
 import br.edu.infnet.continuum_control.ocorrencia.repository.OcorrenciaRepository;
 import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +27,10 @@ public class OcorrenciaService {
     private final MissaoService missaoService;
     private final AgenteService agenteService;
     private final UsuarioService usuarioService;
+    private final HistoricoService historicoService;
 
     @Transactional
-    public Ocorrencia registrar(Long missaoId, Long agenteId, Tipo tipo, String descricao,
+    public Ocorrencia registrar(Long missaoId, Long agenteId, TipoOcorrencia tipo, String descricao,
                                 DistorcaoTemporal distorcaoTemporal, EvidenciaTemporal evidenciaTemporal,
                                 String email) {
         Missao missao = missaoService.buscarPorId(missaoId);
@@ -43,8 +46,12 @@ public class OcorrenciaService {
 
         Ocorrencia ocorrencia = new Ocorrencia(missaoId, agenteId, tipo, descricao, distorcaoTemporal,
                 evidenciaTemporal);
+        ocorrenciaRepository.save(ocorrencia);
 
-        return ocorrenciaRepository.save(ocorrencia);
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.OCORRENCIA,
+                "Ocorrência do tipo " + tipo + " registrada por " + agente.getCodinome());
+
+        return ocorrencia;
     }
 
     public List<Ocorrencia> listarPorMissao(Long missaoId) {

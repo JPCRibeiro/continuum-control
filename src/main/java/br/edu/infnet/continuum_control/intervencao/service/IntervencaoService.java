@@ -4,6 +4,8 @@ import br.edu.infnet.continuum_control.agente.domain.Agente;
 import br.edu.infnet.continuum_control.agente.service.AgenteService;
 import br.edu.infnet.continuum_control.auth.domain.Usuario;
 import br.edu.infnet.continuum_control.auth.service.UsuarioService;
+import br.edu.infnet.continuum_control.historico.domain.TipoHistorico;
+import br.edu.infnet.continuum_control.historico.service.HistoricoService;
 import br.edu.infnet.continuum_control.missao.service.MissaoService;
 import br.edu.infnet.continuum_control.shared.Impacto;
 import br.edu.infnet.continuum_control.intervencao.domain.Intervencao;
@@ -23,6 +25,7 @@ public class IntervencaoService {
     private final MissaoService missaoService;
     private final AgenteService agenteService;
     private final UsuarioService usuarioService;
+    private final HistoricoService historicoService;
 
     @Transactional
     public Intervencao registrar(Long missaoId, Long agenteId, String acao, String justificativa, Impacto impacto,
@@ -39,8 +42,12 @@ public class IntervencaoService {
         missao.validarAgenteParticipante(agente);
 
         Intervencao intervencao = new Intervencao(missao, agente, acao, justificativa, impacto, resultado);
+        intervencaoRepository.save(intervencao);
 
-        return intervencaoRepository.save(intervencao);
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.INTERVENCAO,
+                "Intervenção de impacto " + impacto + " registrada por " + agente.getCodinome());
+
+        return intervencao;
     }
 
     public List<Intervencao> listarPorMissao(Long missaoId) {

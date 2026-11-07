@@ -7,6 +7,8 @@ import br.edu.infnet.continuum_control.anomalia.domain.SituacaoAnomalia;
 import br.edu.infnet.continuum_control.anomalia.service.AnomaliaService;
 import br.edu.infnet.continuum_control.auth.domain.Usuario;
 import br.edu.infnet.continuum_control.auth.service.UsuarioService;
+import br.edu.infnet.continuum_control.historico.domain.TipoHistorico;
+import br.edu.infnet.continuum_control.historico.service.HistoricoService;
 import br.edu.infnet.continuum_control.missao.domain.*;
 import br.edu.infnet.continuum_control.missao.repository.AutorizacaoRepository;
 import br.edu.infnet.continuum_control.missao.repository.EncerramentoRepository;
@@ -32,7 +34,9 @@ public class MissaoService {
     private final AutorizacaoRepository autorizacaoRepository;
     private final EncerramentoRepository encerramentoRepository;
     private final UsuarioService usuarioService;
+    private final HistoricoService historicoService;
 
+    @Transactional
     public Missao registrar(String objetivo, Long anomaliaId, LocalDateTime destinoTemporal,
                             Prioridade prioridade) {
         Anomalia anomalia = anomaliaService.buscarPorId(anomaliaId);
@@ -41,7 +45,12 @@ public class MissaoService {
         String codigo = geradorCodigo.gerar();
         Missao missao = new Missao(codigo, objetivo, anomalia, destinoTemporal, prioridade);
 
-        return missaoRepository.save(missao);
+        missaoRepository.save(missao);
+
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.MISSAO_CRIADA,
+                "Missão " + codigo + " criada com prioridade " + prioridade);
+
+        return missao;
     }
 
     @Transactional
@@ -51,6 +60,9 @@ public class MissaoService {
         Agente agente =  agenteService.buscarPorId(agenteId);
 
         missao.designar(agente);
+
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.AGENTE_DESIGNADO,
+                "Agente " + agente.getCodinome() + " designado para a missão " + missao.getCodigo());
 
         return missao;
     }
@@ -68,6 +80,9 @@ public class MissaoService {
         missao.getAnomalia().iniciarCorrecao();
         missao.getAgentes().forEach(Agente::entrarMissao);
 
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.SITUACAO_ALTERADA,
+                "Missão " + missao.getCodigo() + " iniciada; anomalia em correção");
+
         return missao;
     }
 
@@ -77,6 +92,9 @@ public class MissaoService {
 
         missao.autorizar();
         Autorizacao autorizacao = new Autorizacao(missao, responsavel, observacao);
+
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.AUTORIZACAO,
+                "Missão " + missao.getCodigo() + " autorizada por " + responsavel);
 
         return autorizacaoRepository.save(autorizacao);
     }
@@ -92,6 +110,9 @@ public class MissaoService {
         Encerramento encerramento = new Encerramento(missao, ResultadoMissao.SUCESSO, resumo, impacto,
                 missao.getAnomalia().getSituacao(), observacao);
 
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.ENCERRAMENTO,
+                "Missão " + missao.getCodigo() + " encerrada com sucesso");
+
         return encerramentoRepository.save(encerramento);
     }
 
@@ -106,6 +127,9 @@ public class MissaoService {
         Encerramento encerramento = new Encerramento(missao, ResultadoMissao.FALHA, resumo, impacto,
                 SituacaoAnomalia.CONFIRMADA, observacao);
 
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.ENCERRAMENTO,
+                "Missão " + missao.getCodigo() + " encerrada com falha");
+
         return encerramentoRepository.save(encerramento);
     }
 
@@ -113,6 +137,9 @@ public class MissaoService {
     public Missao cancelar(Long missaoId) {
         Missao missao = buscarPorId(missaoId);
         missao.cancelar();
+
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.ENCERRAMENTO,
+                "Missão " + missao.getCodigo() + " cancelada");
 
         return missao;
     }

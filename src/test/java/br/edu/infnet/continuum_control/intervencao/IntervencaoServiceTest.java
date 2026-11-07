@@ -9,6 +9,7 @@ import br.edu.infnet.continuum_control.auth.domain.Usuario;
 import br.edu.infnet.continuum_control.auth.service.UsuarioService;
 import br.edu.infnet.continuum_control.evento.domain.Evento;
 import br.edu.infnet.continuum_control.evento.domain.Importancia;
+import br.edu.infnet.continuum_control.historico.service.HistoricoService;
 import br.edu.infnet.continuum_control.intervencao.domain.Intervencao;
 import br.edu.infnet.continuum_control.missao.domain.*;
 import br.edu.infnet.continuum_control.intervencao.repository.IntervencaoRepository;
@@ -42,6 +43,9 @@ public class IntervencaoServiceTest {
 
     @Mock
     private UsuarioService usuarioService;
+
+    @Mock
+    private HistoricoService historicoService;
 
     @InjectMocks
     private IntervencaoService intervencaoService;
