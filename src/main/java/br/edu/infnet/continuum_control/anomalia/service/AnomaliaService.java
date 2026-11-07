@@ -37,7 +37,7 @@ public class AnomaliaService {
         anomaliaRepository.save(anomalia);
 
         historicoService.registrar(anomalia, TipoHistorico.ANOMALIA,
-                "Anomalia registrada no evento " + evento.getAcontecimento() + "com risco" + risco);
+                "Anomalia registrada no evento " + evento.getAcontecimento() + " com risco " + risco);
 
         return anomalia;
     }

@@ -6,14 +6,14 @@ import br.edu.infnet.continuum_control.historico.domain.TipoHistorico;
 import java.time.LocalDateTime;
 
 public record HistoricoResponse(
-        Long id,
+        Long anomaliaId,
         TipoHistorico tipo,
         String descricao,
         LocalDateTime ocorridoEm
 ) {
     public static HistoricoResponse from(Historico historico) {
         return new HistoricoResponse(
-                historico.getId(),
+                historico.getAnomalia().getId(),
                 historico.getTipo(),
                 historico.getDescricao(),
                 historico.getOcorridoEm()
