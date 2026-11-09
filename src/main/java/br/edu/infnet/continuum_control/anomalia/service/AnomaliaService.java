@@ -10,6 +10,7 @@ import br.edu.infnet.continuum_control.historico.domain.TipoHistorico;
 import br.edu.infnet.continuum_control.historico.service.HistoricoService;
 import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class AnomaliaService {
         SituacaoAnomalia.EM_CORRECAO
     );
 
+    @CacheEvict(cacheNames = "estadoOperacional", allEntries = true)
     @Transactional
     public Anomalia registrar(Long eventoId, String divergencia, Risco risco, String origem, String observacao) {
         Evento evento = eventoService.buscarPorId(eventoId);
@@ -77,6 +79,7 @@ public class AnomaliaService {
         return anomalia;
     }
 
+    @CacheEvict(cacheNames = "estadoOperacional", allEntries = true)
     @Transactional
     public Anomalia classificarRisco(Long id, Risco risco) {
         Anomalia anomalia = buscarPorId(id);
@@ -99,6 +102,7 @@ public class AnomaliaService {
         return anomalia;
     }
 
+    @CacheEvict(cacheNames = "estadoOperacional", allEntries = true)
     @Transactional
     public Anomalia tornarIrreversivel(Long id) {
         Anomalia anomalia = buscarPorId(id);

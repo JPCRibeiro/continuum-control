@@ -13,6 +13,7 @@ import br.edu.infnet.continuum_control.missao.domain.Missao;
 import br.edu.infnet.continuum_control.intervencao.repository.IntervencaoRepository;
 import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class IntervencaoService {
     private final UsuarioService usuarioService;
     private final HistoricoService historicoService;
 
+    @CacheEvict(cacheNames = "estadoOperacional", allEntries = true)
     @Transactional
     public Intervencao registrar(Long missaoId, Long agenteId, String acao, String justificativa, Impacto impacto,
                                  String resultado, String email) {

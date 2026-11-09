@@ -6,6 +6,7 @@ import br.edu.infnet.continuum_control.agente.repository.AgenteRepository;
 import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
 import br.edu.infnet.continuum_control.shared.GeradorCodigo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ public class AgenteService {
     private final AgenteRepository agenteRepository;
     private final GeradorCodigo geradorCodigo;
 
+    @CacheEvict(cacheNames = "estadoOperacional", allEntries = true)
     public Agente registrar(String codinome, String especialidade) {
         Agente agente = new Agente(geradorCodigo.gerar(), codinome, especialidade);
 
@@ -53,6 +55,7 @@ public class AgenteService {
         return agente;
     }
 
+    @CacheEvict(cacheNames = "estadoOperacional", allEntries = true)
     @Transactional
     public Agente inativar(Long id) {
         Agente agente = buscarPorId(id);

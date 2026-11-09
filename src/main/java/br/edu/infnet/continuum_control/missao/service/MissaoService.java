@@ -18,6 +18,7 @@ import br.edu.infnet.continuum_control.shared.Impacto;
 import br.edu.infnet.continuum_control.shared.api.AcessoNegadoException;
 import br.edu.infnet.continuum_control.shared.api.EntidadeNaoLocalizadaException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +68,7 @@ public class MissaoService {
         return missao;
     }
 
+    @CacheEvict(cacheNames = "estadoOperacional", allEntries = true)
     @Transactional
     public Missao iniciar(Long missaoId, String email) {
         Missao missao = buscarPorId(missaoId);
@@ -99,6 +101,7 @@ public class MissaoService {
         return autorizacaoRepository.save(autorizacao);
     }
 
+    @CacheEvict(cacheNames = "estadoOperacional", allEntries = true)
     @Transactional
     public Encerramento concluir(Long missaoId, String resumo, Impacto impacto, String observacao) {
         Missao missao = buscarPorId(missaoId);
@@ -116,6 +119,7 @@ public class MissaoService {
         return encerramentoRepository.save(encerramento);
     }
 
+    @CacheEvict(cacheNames = "estadoOperacional", allEntries = true)
     @Transactional
     public Encerramento falhar(Long missaoId, String resumo, Impacto impacto, String observacao) {
         Missao missao = buscarPorId(missaoId);
