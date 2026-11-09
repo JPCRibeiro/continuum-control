@@ -66,6 +66,12 @@ public class MissaoController {
         return MissaoResponse.from(missaoService.cancelar(id));
     }
 
+    @PreAuthorize("hasAnyRole('OPERADOR', 'SUPERVISOR', 'ADMINISTRADOR')")
+    @PutMapping("/{id}")
+    public MissaoResponse atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarMissaoRequest req) {
+        return MissaoResponse.from(missaoService.atualizar(id, req.objetivo(), req.destinoTemporal(), req.prioridade()));
+    }
+
     @GetMapping("/{id}")
     public MissaoResponse buscarPorId(@PathVariable Long id) {
         return MissaoResponse.from(missaoService.buscarPorId(id));

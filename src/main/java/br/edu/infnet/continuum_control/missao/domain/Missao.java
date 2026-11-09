@@ -23,6 +23,7 @@ public class Missao {
     @Column(nullable = false, unique = true, length = 8)
     private String codigo;
 
+    @Setter
     @Column(nullable = false)
     private String objetivo;
 
@@ -30,6 +31,7 @@ public class Missao {
     @JoinColumn(name = "anomalia_id", nullable = false)
     private Anomalia anomalia;
 
+    @Setter
     @Column(nullable = false)
     private LocalDateTime destinoTemporal;
 
@@ -144,6 +146,13 @@ public class Missao {
     public void validarAgenteParticipante(Agente agente) {
         if (!possuiAgente(agente)) {
             throw new OperacaoInvalidaException("Agente não participa desta missão.");
+        }
+    }
+
+    public void validarAceitaAlteracao() {
+        if (situacao != SituacaoMissao.PLANEJADA) {
+            throw new OperacaoInvalidaException(
+                    "Somente missões planejadas podem ser alteradas. Estado atual: " + situacao);
         }
     }
 }

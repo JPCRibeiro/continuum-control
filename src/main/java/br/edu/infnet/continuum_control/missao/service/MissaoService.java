@@ -144,6 +144,18 @@ public class MissaoService {
         return missao;
     }
 
+    @Transactional
+    public Missao atualizar(Long id, String objetivo, LocalDateTime destinoTemporal, Prioridade prioridade) {
+        Missao missao = buscarPorId(id);
+        missao.validarAceitaAlteracao();
+
+        missao.setObjetivo(objetivo);
+        missao.setDestinoTemporal(destinoTemporal);
+        missao.setPrioridade(prioridade);
+
+        return missao;
+    }
+
     public List<Missao> listar() {
         return  missaoRepository.findAll();
     }
