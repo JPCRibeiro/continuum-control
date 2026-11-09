@@ -45,7 +45,8 @@ public class IntervencaoService {
         intervencaoRepository.save(intervencao);
 
         historicoService.registrar(missao.getAnomalia(), TipoHistorico.INTERVENCAO,
-                "Intervenção de impacto " + impacto + " registrada por " + agente.getCodinome());
+                "Intervenção de impacto " + impacto + " registrada por " + agente.getCodinome() +
+                        " na missão " + missao.getCodigo());
 
         return intervencao;
     }

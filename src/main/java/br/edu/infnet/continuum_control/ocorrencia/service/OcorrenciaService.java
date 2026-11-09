@@ -44,14 +44,14 @@ public class OcorrenciaService {
         missao.validarAceitaOcorrencia();
         missao.validarAgenteParticipante(agente);
 
+        historicoService.registrar(missao.getAnomalia(), TipoHistorico.OCORRENCIA,
+                "Ocorrência do tipo " + tipo + " registrada por " + agente.getCodinome() +
+                        " na missão " + missao.getCodigo());
+
         Ocorrencia ocorrencia = new Ocorrencia(missaoId, agenteId, tipo, descricao, distorcaoTemporal,
                 evidenciaTemporal);
-        ocorrenciaRepository.save(ocorrencia);
 
-        historicoService.registrar(missao.getAnomalia(), TipoHistorico.OCORRENCIA,
-                "Ocorrência do tipo " + tipo + " registrada por " + agente.getCodinome());
-
-        return ocorrencia;
+        return ocorrenciaRepository.save(ocorrencia);
     }
 
     public List<Ocorrencia> listarPorMissao(Long missaoId) {
