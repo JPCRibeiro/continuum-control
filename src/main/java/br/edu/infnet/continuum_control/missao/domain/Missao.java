@@ -90,9 +90,14 @@ public class Missao {
     }
 
     public void autorizar() {
+        if (!exigeAutorizacao()) {
+            throw new OperacaoInvalidaException("Esta missão não exige autorização prévia.");
+        }
+
         if (situacao != SituacaoMissao.PLANEJADA) {
             throw new OperacaoInvalidaException(
-                    "Somente missões planejadas podem ser autorizadas. Estado atual: " + situacao);
+                    "Somente missões planejadas podem ser autorizadas. Estado atual: " + situacao
+            );
         }
 
         this.situacao = SituacaoMissao.AUTORIZADA;

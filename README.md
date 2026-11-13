@@ -1,150 +1,115 @@
 # Continuum Control API
 
-### Sistema de Gestão e Controle da Integridade Temporal da Continuum Authority
+Sistema de Gestão e Controle da Integridade Temporal da Continuum Authority.
 
-## Serviços necessários
+## Arquitetura de Dados
 
-| Serviço | Versão | Porta | Função |
-|---|---|---|---|
-| PostgreSQL | 17 | 5432 | dados transacionais do domínio |
-| MongoDB | 8 | 27017 | ocorrências de campo |
-| Redis | 7.4 | 6379 | cache do estado operacional |
+O projeto utiliza três bancos de dados diferentes, rodando via Docker, cada um resolvendo um problema específico da aplicação:
 
-Os três sobem pelo docker-compose.yml e são necessários para o funcionamento completo.
+* **PostgreSQL (Relacional):** Guarda os dados centrais — agentes, usuários, eventos, anomalias, missões, autorizações, encerramentos e o histórico temporal. Os vínculos são obrigatórios (uma anomalia exige um evento, uma missão exige uma anomalia) e as chaves estrangeiras fazem o próprio banco recusar estados inválidos. Há operações que mudam várias entidades de uma vez: o `MissaoService.iniciar` altera a missão, todos os agentes designados e a anomalia, e grava o histórico. Se um agente estiver indisponível, nada é efetivado. Nem bancos de documento nem chave-valor garantem integridade transacional entre entidades distintas, justificando a separação.
 
-## Configurar
+* **MongoDB (NoSQL Documento):** Armazena as ocorrências relatadas em campo. Foi escolhido porque as ocorrências possuem estruturas variadas (uma *Distorção* tem campos de tempo e intensidade, enquanto uma *Evidência* tem campos de objeto e confiabilidade). Um banco relacional exigiria muitas colunas nulas ou tabelas complexas para acomodar esses dados flexíveis.
 
-Todas as propriedades têm valor padrão para execução local e são sobrescritas por
-variável de ambiente, sem recompilar.
+* **Redis (Chave-Valor):** Armazena em cache o Índice de Estabilidade Temporal e as contagens do painel operacional. O painel é lido com frequência, e o Redis entrega o resultado instantaneamente, aliviando o PostgreSQL de fazer sete contagens de agregações a cada consulta. O TTL serve como rede de segurança, mas a invalidação explícita (`@CacheEvict`) garante que o painel reflita alterações imediatamente. Como não possui relacionamentos estruturados nem suporte a transações complexas, não seria adequado manter os dados de negócio aqui.
 
-| Variável | Padrão |
-|---|---|
-| `SERVER_PORT` | `8080` |
-| `DB_URL` | `jdbc:postgresql://localhost:5432/continuum_control` |
-| `DB_USER` / `DB_PASSWORD` | `user` / `dev` |
-| `DDL_AUTO` | `create-drop` |
-| `MONGO_URI` | `mongodb://localhost:27017/continuum_control` |
-| `REDIS_HOST` / `REDIS_PORT` | `localhost` / `6379` |
-| `JWT_SECRET_KEY` | chave de desenvolvimento (mínimo 32 caracteres) |
-| `JWT_TTL` | `PT2H` |
+## Configuração
 
-`DDL_AUTO` é `create-drop`: o schema é recriado a cada inicialização e o
-`src/main/resources/data.sql` carrega os dados iniciais em seguida.
+Para rodar localmente você não precisa configurar nada, pois todos os parâmetros possuem valores padrão. No entanto, nenhum valor está fixo no código: todos são lidos de variáveis de ambiente e podem ser alterados conforme o ambiente de execução, sem necessidade de recompilação.
 
-## Construir
+| Variável | Padrão | 
+| ----- | ----- | 
+| `SERVER_PORT` | `8080` | 
+| `DB_URL` | `jdbc:postgresql://localhost:5432/continuum_control` | 
+| `DB_USER` / `DB_PASSWORD` | `user` / `dev` | 
+| `DDL_AUTO` | `create-drop` | 
+| `MONGO_URI` | `mongodb://localhost:27017/continuum_control` | 
+| `REDIS_HOST` / `REDIS_PORT` | `localhost` / `6379` | 
+| `JWT_SECRET_KEY` | chave de desenvolvimento (mínimo 32 caracteres) | 
+| `JWT_TTL` | `PT2H` | 
+
+É através destas variáveis que o `docker-compose.yml` aponta a aplicação para os contêineres em vez do `localhost`.
+
+## Como rodar localmente
+
+### 1. Iniciar os bancos de dados
+
+Na raiz do projeto, suba a infraestrutura utilizando o Docker:
+
+```bash
+docker compose up -d postgres mongodb redis
+```
+
+Os contêineres possuem `healthchecks` configurados para garantir que subam corretamente antes da aplicação.
+
+### 2. Construir o artefato
+
+Gera o JAR executável e autocontido da aplicação na pasta `target/`:
 
 ```bash
 ./mvnw clean package
 ```
 
-Gera o executável na pasta target.
+É este arquivo que o Docker copia para a imagem, e ele também pode rodar sozinho via linha de comando (`java -jar target/continuum-control-0.0.1-SNAPSHOT.jar`). Para o passo 3 abaixo este build prévio não é obrigatório, pois o comando do Spring Boot compila e executa diretamente das classes.
 
-## Testar
+### 3. Iniciar a API
+
+Com os bancos rodando, inicie a aplicação Spring Boot localmente:
+
+```bash
+./mvnw spring-boot:run
+```
+
+A cada inicialização, como o `ddl-auto` está configurado como `create-drop` e a inicialização de SQL está ativa, o *schema* é recriado e o arquivo `data.sql` recarrega automaticamente a massa de dados iniciais.
+
+*Se preferir rodar **tudo** pelo Docker (app + bancos simultaneamente), basta empacotar (`./mvnw clean package`) e rodar:*
+
+```bash
+docker compose up --build
+```
+
+### 4. Rodar os Testes
+
+Para rodar a suíte de testes automatizados (que roda de forma independente usando H2 em memória, sem depender de containers, e valida as regras de negócio):
 
 ```bash
 ./mvnw test
 ```
 
-Roda os testes sem nenhum serviço externo.
+## Como usar a API
 
-## Executar
+Para verificar se a aplicação subiu corretamente, acesse a rota do Actuator:
+`http://localhost:8080/actuator/health` (esperado: status `UP`).
 
-**Com Docker** — o `Dockerfile` copia o artefato já construído, então empacote antes:
+### 1. Fazer Login
 
-```bash
-./mvnw clean package
-docker compose up --build
-```
+O sistema possui controle de acesso baseado em perfis (RBAC). A carga inicial de dados cria os seguintes usuários. **A senha para todos é `senha123`.**
 
-Os três bancos sobem com `healthcheck` e a aplicação só inicia depois que todos
-respondem.
+* `admin@continuum.control` (ADMINISTRADOR)
+* `supervisor@continuum.control` (SUPERVISOR)
+* `operador@continuum.control` (OPERADOR)
+* `bond@continuum.control` (AGENTE - James Bond)
+* `loki@continuum.control` (AGENTE - Loki)
+* `ada@continuum.control` (AGENTE - Ada)
 
-**Local** — suba apenas os bancos:
+Faça uma requisição `POST` para `http://localhost:8080/api/auth/login`:
 
-```bash
-docker compose up -d postgres mongodb redis
-./mvnw spring-boot:run
-```
-
-## Verificar
-
-**1. Saúde**
-
-```bash
-http://localhost:8080/actuator/health
-```
-
-Esperado: `{"status":"UP"}`.
-
-**2. Autenticar**
-
-Usuários da carga inicial, todos com a senha `senha123`:
-
-| Email | Perfil |
-|---|---|
-| `operador@continuum.control` | OPERADOR |
-| `supervisor@continuum.control` | SUPERVISOR |
-| `admin@continuum.control` | ADMINISTRADOR |
-| `bond@continuum.control` | AGENTE |
-| `loki@continuum.control` | AGENTE |
-| `ada@continuum.control` | AGENTE |
-
-```bash
-POST http://localhost:8080/api/auth/login
-
+```json
 {
-  "email":"admin@continuum.control",
-  "senha":"senha123"
+  "email": "admin@continuum.control",
+  "senha": "senha123"
 }
 ```
 
-Devolve `200` com o token. Senha errada devolve `401`.
+A API devolverá um token JWT com status `200 OK`.
 
-**3. Consultar com o token JWT**
+### 2. Consumir Rotas Protegidas
 
-```bash
-http://localhost:8080/api/estado-operacional
+Copie o token recebido e passe-o no cabeçalho `Authorization` como `Bearer <token>`.
+Experimente buscar o painel de estabilidade fazendo um `GET` na rota:
 
-Authorization: Bearer Token
+```text
+GET http://localhost:8080/api/estado-operacional
+Authorization: Bearer <seu-token-jwt>
 ```
 
-Devolve as contagens operacionais e o índice de estabilidade. Sem o cabeçalho, a
-mesma rota devolve `401`.
-
-## Persistência
-
-### PostgreSQL (relacional)
-
-Guarda agentes, usuários, eventos, anomalias, missões, designações, autorizações, intervenções,
-encerramentos e o histórico temporal.
-
-É o modelo adequado porque esses dados são fortemente relacionados e com vínculos
-obrigatórios: uma anomalia exige um evento, uma missão exige uma anomalia. E há
-operações que mudam várias entidades de uma vez — o `MissaoService.iniciar` altera
-a missão, todos os agentes designados e a anomalia, e grava o histórico. Se um
-agente estiver indisponível, nada é efetivado.
-
-Não caberia nos outros: nem documento nem chave-valor garantem transação entre
-entidades distintas.
-
-### MongoDB (NoSQL)
-
-Guarda as ocorrências registradas pelos agentes durante as missões.
-
-É o modelo adequado porque nem todas as ocorrências possuirão a mesma estrutura, cada tipo de ocorrência tem uma estrutura diferente:
-
-- uma distorção temporal carrega intensidade e duração; uma evidência temporal carrega objeto, período estimado e grau de confiabilidade.
-
-Não caberia no relacional: uma tabela única precisaria de colunas para todos os tipos,
-nulas por construção na maior parte das linhas.
-
-### Redis (chave-valor)
-
-Guarda uma única chave, `estadoOperacional::atual`, com o painel operacional já
-calculado e expiração de 30 segundos.
-
-É o modelo adequado porque o acesso é por chave conhecida, sem consulta e sem
-relacionamento, e a expiração é nativa. O painel é lido com frequência e custa sete
-contagens sobre quatro tabelas, enquanto os números por trás mudam pouco.
-
-Não guarda mais nada: não tem relacionamento e nem transação. Se for apagado, a próxima consulta recalcula.
+Você receberá as contagens de missões e o índice de estabilidade da linha temporal. Regras de segurança granulares bloqueiam acessos indevidos dependendo do perfil autenticado (por exemplo, impedindo que um Agente tente modificar a missão de outro).
